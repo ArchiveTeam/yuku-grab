@@ -54,7 +54,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   
   local function check(urla, origurl)
     local url = string.match(urla, "^([^#]+)")
-    if (downloaded[url] ~= true and addedtolist[url] ~= true) and string.match(url, "^https?://[^/]*"..item_value) and ((item_type == "10threads" and string.match(url, "[^0-9]"..item_thread.."[0-9]") and not string.match(url, "[^0-9]"..item_thread.."[0-9][0-9]")) or (item_type == "thread" and string.match(url, "[^0-9]"..item_thread) and not string.match(url, "[^0-9]"..item_thread.."[0-9]")) or string.match(url, "https?://[^/]+/forum/[^/]+/id/") or string.match(url, "https?://[^/]+/s?reply/")) then
+    if (downloaded[url] ~= true and addedtolist[url] ~= true) and ((string.match(url, "^https?://[^/]*"..item_value) and ((item_type == "10threads" and string.match(url, "[^0-9]"..item_thread.."[0-9]") and not string.match(url, "[^0-9]"..item_thread.."[0-9][0-9]")) or (item_type == "thread" and string.match(url, "[^0-9]"..item_thread) and not string.match(url, "[^0-9]"..item_thread.."[0-9]")) or string.match(url, "https?://[^/]+/forum/[^/]+/id/") or string.match(url, "https?://[^/]+/s?reply/"))) or string.match(url, "^https?://[^/]*amazonaws%.com") or string.match(url, "^https?://[^/]*images%.yuku%.com")) then
       if string.match(url, "&amp;") then
         table.insert(urls, { url=string.gsub(url, "&amp;", "&") })
         addedtolist[url] = true
