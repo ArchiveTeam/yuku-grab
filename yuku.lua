@@ -107,18 +107,27 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. ".  \n")
   io.stdout:flush()
 
-  if downloaded[url["url"]] == true then
+  local function check_loop(part_)
+    for part in part_ do
+      part = string.gsub(part, '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])', "%%%1")
+      if string.find(url["url"], "/"..part.."/"..part.."/"..part.."/") or string.find(url["url"], "%%"..part.."%%"..part.."%%"..part.."%%") then
+        return wget.actions.EXIT
+      end
+    end
+  end
+
+  if downloaded[url["url"]] == true and status_code >= 200 and status_code < 400 then
     return wget.actions.EXIT
   end
 
-  if (status_code >= 200 and status_code <= 399) then
-    if string.match(url.url, "https://") then
-      local newurl = string.gsub(url.url, "https://", "http://")
-      downloaded[newurl] = true
-    else
-      downloaded[url.url] = true
-    end
+  if (status_code >= 200 and status_code < 400) then
+    downloaded[url["url"]] = true
   end
+
+  check_loop(string.gmatch(url["url"], "([^/]*)"))
+  check_loop(string.gmatch(url["url"], "([^/]+/[^/]*)"))
+  check_loop(string.gmatch(url["url"], "([^%%]*)"))
+  check_loop(string.gmatch(url["url"], "([^%%]+%%[^%%]*)"))
 
   if string.match(url["url"], "^https?://[^/]+/forum/previous/topic/") or string.match(url["url"], "^https?://[^/]+/forum/next/topic/") then
     return wget.actions.EXIT
